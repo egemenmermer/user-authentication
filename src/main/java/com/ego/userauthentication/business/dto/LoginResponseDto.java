@@ -9,12 +9,10 @@ import lombok.extern.log4j.Log4j2;
 import java.io.Serializable;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Log4j2
 public class LoginResponseDto {
 
-    private String message;
+    private String token;
 
 }
