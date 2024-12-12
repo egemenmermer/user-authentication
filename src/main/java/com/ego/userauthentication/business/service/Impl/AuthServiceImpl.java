@@ -60,6 +60,9 @@ public class AuthServiceImpl implements UserDetailsService, AuthService {
         UserEntity newUser = new UserEntity();
         newUser.setUsername(registerDto.getUsername());
         newUser.setPassword(passwordEncoder.encode(registerDto.getPassword()));
+        newUser.setEmail(registerDto.getEmail());
+
+        System.out.println("user to be saved: " + newUser );
         return userRepository.save(newUser);
     }
 }

@@ -1,14 +1,12 @@
 package com.ego.userauthentication.security.jwt;
-
-import com.ego.userauthentication.business.service.AuthService;
 import com.ego.userauthentication.business.service.Impl.AuthServiceImpl;
 import com.ego.userauthentication.util.JwtTokenUtil;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +22,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    @Value("${api.base.path}")
+    private String basePath;
+
     @Autowired
     private AuthServiceImpl authServiceImpl;
     private AuthServiceImpl userDetailsService;
@@ -32,11 +33,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        // Eğer yol izin verilen bir yolsa kontrol yapmadan devam et
         String requestPath = request.getServletPath();
-        if (requestPath.equals("/register") || requestPath.equals("/authenticate")) {
+        logger.info("Incoming request path: " + requestPath + "");
+        if ( requestPath.equals( basePath +  "/authenticate") || requestPath.equals(basePath + "/register") ) {
             chain.doFilter(request, response);
-            return; // Hiçbir işlem yapma, filtreyi geçir
+            return;
         }
 
         final String authorizationHeader = request.getHeader("Authorization");
@@ -44,17 +45,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String username = null;
         String jwt = null;
 
-        // Authorization Header yoksa veya Bearer ile başlamıyorsa
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             logger.warn("JWT Token does not begin with Bearer String");
-            chain.doFilter(request, response); // Doğrulama yapmadan devam
+            chain.doFilter(request, response);
             return;
         }
 
-        jwt = authorizationHeader.substring(7); // Bearer'ı kesip sadece tokeni al
+        jwt = authorizationHeader.substring(7);
         username = jwtTokenUtil.extractUsername(jwt);
 
-        // Kullanıcı doğrulama ve token kontrolü burada yapılır
+
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 

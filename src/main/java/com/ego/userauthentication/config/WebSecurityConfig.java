@@ -55,7 +55,8 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/", "/api/v1/index", "/success", "/login",
-                                "/authenticate", "/register").permitAll() // Public endpoints
+                                "/authenticate", "/register", "/api/v1/auth/register",
+                                "/api/v1/auth/authenticate" ).permitAll() // Public endpoints
                         .requestMatchers(
                                 "/swagger-ui/**", "/v3/api-docs/**", "/asm-swagger.html",
                                 "/api-docs/**", "/api-docs/swagger-config", "/asm-swagger").permitAll() // Swagger endpoints

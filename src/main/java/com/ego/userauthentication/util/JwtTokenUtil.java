@@ -1,7 +1,9 @@
 package com.ego.userauthentication.util;
 
-import io.jsonwebtoken.*;
-import lombok.extern.log4j.Log4j2;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -9,10 +11,8 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.function.Function;
-import java.util.logging.ErrorManager;
 
 @Component
-@Log4j2
 public class JwtTokenUtil implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -35,16 +35,6 @@ public class JwtTokenUtil implements Serializable {
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
-    }
-
-    public String extractUsername(String token) {
-        try {
-            return getUsernameFromToken(token);
-        } catch (JwtException | IllegalArgumentException e) {
-            // Log and handle the exception
-            log.error("Failed to extract username from token", e);
-            return null;
-        }
     }
 
     public Claims getAllClaimsFromToken(String token) {
@@ -70,7 +60,12 @@ public class JwtTokenUtil implements Serializable {
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
+        System.out.println( "validateToken: " + token);
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public String extractUsername(String jwt) {
+        return getUsernameFromToken(jwt);
     }
 }
