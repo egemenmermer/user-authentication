@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,4 +13,13 @@ import lombok.extern.log4j.Log4j2;
 public class RegisterDto {
     private String username;
     private String password;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
 }
